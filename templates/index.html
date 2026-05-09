@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CryptoVault — Live Market Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/main.css" />
+</head>
+<body>
+  <div class="noise"></div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-brand">
+      <span class="logo-mark">⬡</span>
+      <span class="logo-text">CryptoVault</span>
+    </div>
+    <div class="nav-right">
+      <div class="live-badge">
+        <span class="pulse"></span>
+        LIVE
+      </div>
+      <span class="nav-time" id="clock">--:--:-- UTC</span>
+    </div>
+  </nav>
+
+  <!-- HERO STATS BAR -->
+  <section class="stats-bar">
+    <div class="stat-item">
+      <span class="stat-label">Market Cap</span>
+      <span class="stat-value" id="stat-mcap">—</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-label">24h Volume</span>
+      <span class="stat-value" id="stat-vol">—</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-label">BTC Dominance</span>
+      <span class="stat-value" id="stat-dom">—</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-label">Active Coins</span>
+      <span class="stat-value" id="stat-coins">—</span>
+    </div>
+  </section>
+
+  <!-- MAIN CONTENT -->
+  <main>
+    <!-- CHART PANEL -->
+    <section class="chart-section">
+      <div class="chart-header">
+        <div>
+          <h2 class="chart-title" id="chart-coin-name">Bitcoin</h2>
+          <p class="chart-subtitle">30-day price history</p>
+        </div>
+        <div class="chart-price-display">
+          <span class="chart-current-price" id="chart-price">$—</span>
+          <span class="chart-change" id="chart-change">—</span>
+        </div>
+      </div>
+      <canvas id="priceChart" height="240"></canvas>
+    </section>
+
+    <!-- COINS TABLE -->
+    <section class="coins-section">
+      <h2 class="section-title">Top Assets</h2>
+      <div class="coins-grid" id="coins-grid">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <span>CryptoVault v1.0.0</span>
+    <span>Python Flask · Built for CI/CD</span>
+    <span id="footer-update">Last updated: —</span>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="/static/js/main.js"></script>
+</body>
+</html>
