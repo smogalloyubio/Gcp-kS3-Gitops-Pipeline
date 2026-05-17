@@ -86,7 +86,7 @@ jobs:
           key: trivy-db
 
       - name: Scan Docker image
-        uses: aquasecurity/trivy-action@0.32.0
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ steps.meta.outputs.tags }}
           format: table
