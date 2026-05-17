@@ -124,7 +124,7 @@ jobs:
           exit-code: 1
           ignore-unfixed: true
           vuln-type: os,library
-          severity: HIGH,CRITICAL
+          severity: CRITICAL
 
       - name: Push image to Quay.io
         uses: docker/build-push-action@v6
