@@ -4,7 +4,7 @@ metadata:
   name: mypython-app
   namespace: ubiowororuki-dev
 spec:
-  replicas: 1
+  replicas: 4
   selector:
     matchLabels:
       app: mypython-app
