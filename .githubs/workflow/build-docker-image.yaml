@@ -7,13 +7,18 @@ on:
     branches: [main]
 
 env:
-  IMAGE_NAME: cryptovault
-  REGISTRY: ghcr.io
+  IMAGE_NAME: my-crytop-app
+  REGISTRY: quay.io
+  QUAY_ORG: ${{ secrets.QUAY_ORG }}
+  QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
+  QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
+  OPENSHIFT_NAMESPACE: ubiowororuki-dev
+  OPENSHIFT_SERVER: ${{ secrets.OPENSHIFT_SERVER }}
+  OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_TOKEN }}
 
 jobs:
-  # ─────────────────────────────────────────
-  # JOB 1: Test
-  # ─────────────────────────────────────────
+
+
   test:
     name: Run Tests
     runs-on: ubuntu-latest
@@ -30,94 +35,119 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
+          pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Run tests
         run: pytest tests/ -v --tb=short
 
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: test-results/
-
-  # ─────────────────────────────────────────
-  # JOB 2: Build & Push Docker Image
-  # ─────────────────────────────────────────
   build:
-    name: Build Docker Image
+    name: Build, Scan and Push Image
     runs-on: ubuntu-latest
     needs: test
     if: github.ref == 'refs/heads/main'
 
-    permissions:
-      contents: read
-      packages: write
-
-    outputs:
-      image_tag: ${{ steps.meta.outputs.tags }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Log in to GitHub Container Registry
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Quay.io
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: quay.io
+          username: ${{ env.QUAY_USERNAME }}
+          password: ${{ env.QUAY_PASSWORD }}
 
-      - name: Extract metadata for Docker
+      - name: Docker metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
+          images: quay.io/${{ env.QUAY_ORG }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=sha,prefix=sha-
             type=raw,value=latest
+            type=sha
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+      - name: Build Docker image (load for Trivy)
+        uses: docker/build-push-action@v6
         with:
           context: .
-          push: true
+          file: ./Dockerfile
+          push: false
+          load: true
           tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # ─────────────────────────────────────────
-  # JOB 3: Deploy (example — adapt to your infra)
-  # ─────────────────────────────────────────
+      - name: Cache Trivy DB
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/trivy
+          key: trivy-db
+
+      - name: Scan Docker image
+        uses: aquasecurity/trivy-action@0.32.0
+        with:
+          image-ref: ${{ steps.meta.outputs.tags }}
+          format: table
+          exit-code: 1
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
+
+      - name: Push image to Quay.io
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
   deploy:
-    name: Deploy to Production
+    name: Deploy to OpenShift
     runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/main'
-    environment: production
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
-          script: |
-            cd /opt/cryptovault
-            docker pull ghcr.io/${{ github.repository_owner }}/cryptovault:latest
-            docker compose down
-            docker compose up -d
-            echo "✅ Deployed successfully at $(date)"
-
-      - name: Health check after deploy
+      - name: Install OpenShift CLI
         run: |
-          sleep 15
-          curl --fail http://${{ secrets.DEPLOY_HOST }}:5000/health || exit 1
-          echo "✅ Health check passed"
+          curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz
+          tar -xzf oc.tar.gz
+          sudo mv oc /usr/local/bin/
+          oc version --client
+
+      - name: Install Kustomize
+        run: |
+          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          sudo mv kustomize /usr/local/bin/
+          kustomize version
+
+      - name: Login to OpenShift
+        run: |
+          oc login \
+            --server=${{ env.OPENSHIFT_SERVER }} \
+            --token=${{ env.OPENSHIFT_TOKEN }} \
+            --insecure-skip-tls-verify=true
+
+
+      - name: Update Kustomize image reference
+        run: |
+          cd kustomize/
+          kustomize edit set image quay.io/${{ env.QUAY_ORG }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Deploy with Kustomize
+        run: |
+          cd kustomize/
+          kustomize build . | oc apply -f -
+
+      - name: Verify rollout
+        run: |
+          oc rollout status deployment/${{ env.IMAGE_NAME }} -n ${{ env.OPENSHIFT_NAMESPACE }}
