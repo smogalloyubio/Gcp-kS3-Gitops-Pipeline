@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: crypto-
+  name: mypython-app
   namespace: ubiowororuki-dev
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: crypto-dashboard
+      app: mypython-app
   template:
     metadata:
       labels:
-        app: crypto-dashboard
+        app: mypython-app
     spec:
       containers:
-        - name: crypto-dashboard
-          image: quay.io/your-org/crypto-dashboard:latest
+        - name: mypython-app
+          image: quay.io/ubiowororuki/mypython-app:latest
           ports:
             - containerPort: 5000
           env:
