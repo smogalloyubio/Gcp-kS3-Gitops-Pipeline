@@ -1,18 +1,151 @@
-name: Docker Image CI
+name: CryptoVault CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [main, develop]
   pull_request:
-    branches: [ "main" ]
+    branches: [main]
+
+env:
+  IMAGE_NAME: my-crytop-app
+  REGISTRY: quay.io
+  QUAY_ORG: ${{ secrets.QUAY_ORG }}
+  QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
+  QUAY_PASSWORD: ${{ secrets.QUAY_TOKEN }}
+  OPENSHIFT_NAMESPACE: ubiowororuki-dev
+  OPENSHIFT_SERVER: ${{ secrets.OPENSHIFT_SERVER }}
+  OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_TOKEN }}
 
 jobs:
-
-  build:
-
+  test:
+    name: Run Tests
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: pytest tests/ -v --tb=short
+
+  build:
+    name: Build, Scan and Push Image
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Quay.io
+        uses: docker/login-action@v3
+        with:
+          registry: quay.io
+          username: ${{ env.QUAY_USERNAME }}
+          password: ${{ env.QUAY_PASSWORD }}
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: quay.io/${{ env.QUAY_ORG }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
+            type=sha
+
+      - name: Build Docker image (load for Trivy)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          load: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Cache Trivy DB
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/trivy
+          key: trivy-db
+
+      - name: Scan Docker image
+        uses: aquasecurity/trivy-action@0.32.0
+        with:
+          image-ref: ${{ steps.meta.outputs.tags }}
+          format: table
+          exit-code: 1
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
+
+      - name: Push image to Quay.io
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy to OpenShift
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install OpenShift CLI
+        run: |
+          curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz
+          tar -xzf oc.tar.gz
+          sudo mv oc /usr/local/bin/
+          oc version --client
+
+      - name: Install Kustomize
+        run: |
+          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          sudo mv kustomize /usr/local/bin/
+          kustomize version
+
+      - name: Login to OpenShift
+        run: |
+          oc login \
+            --server=${{ env.OPENSHIFT_SERVER }} \
+            --token=${{ env.OPENSHIFT_TOKEN }} \
+            --insecure-skip-tls-verify=true
+
+
+      - name: Update Kustomize image reference
+        run: |
+          cd kustomize/
+          kustomize edit set image quay.io/${{ env.QUAY_ORG }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Deploy with Kustomize
+        run: |
+          cd kustomize/
+          kustomize build . | oc apply -f -
+
+      - name: Verify rollout
+        run: |
+          oc rollout status deployment/${{ env.IMAGE_NAME }} -n ${{ env.OPENSHIFT_NAMESPACE }}
