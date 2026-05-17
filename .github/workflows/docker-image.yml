@@ -175,7 +175,7 @@ jobs:
 
       - name: Deploy with Kustomize
         run: |
-          cd kustomize/
+          cd kustomized/
           kustomize build . | oc apply -f -
 
       - name: Verify rollout
