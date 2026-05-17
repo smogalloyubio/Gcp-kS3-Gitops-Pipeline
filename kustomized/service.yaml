@@ -2,10 +2,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: crypto-dashboard
+  namespace: ubiowororuki-dev
 spec:
   selector:
     app: crypto-dashboard
   ports:
     - name: http
-      port: 80
+      port: 5000
       targetPort: 5000

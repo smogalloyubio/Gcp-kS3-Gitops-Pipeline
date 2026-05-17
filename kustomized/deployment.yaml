@@ -1,7 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: crypto-dashboard
+  name: crypto-
+  namespace: ubiowororuki-dev
 spec:
   replicas: 1
   selector:
