@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crypto-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crypto-dashboard
+  template:
+    metadata:
+      labels:
+        app: crypto-dashboard
+    spec:
+      containers:
+        - name: crypto-dashboard
+          image: quay.io/your-org/crypto-dashboard:latest
+          ports:
+            - containerPort: 5000
+          env:
+            - name: FLASK_ENV
+              value: production
