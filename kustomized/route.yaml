@@ -8,7 +8,5 @@ spec:
     kind: Service
     name: mypython-app
   port:
-    targetPort: http
-  tls:
-    termination: edge
-    insecureEdgeTerminationPolicy: Redirect
+    targetPort: 5000
+ 
