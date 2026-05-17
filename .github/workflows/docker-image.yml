@@ -170,7 +170,7 @@ jobs:
 
       - name: Update Kustomize image reference
         run: |
-          cd kustomize/
+          cd kustomized/
           kustomize edit set image quay.io/${{ env.QUAY_ORG }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Deploy with Kustomize
