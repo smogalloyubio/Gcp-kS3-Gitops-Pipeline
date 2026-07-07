@@ -62,6 +62,6 @@ jobs:
 
       - name: Run Terraform scan 
         run: |
-          checkov -d ./terraform \
+          checkov -d ./Terraform \
             --framework terraform \
             --output json > checkov-terraform-report.json || true
