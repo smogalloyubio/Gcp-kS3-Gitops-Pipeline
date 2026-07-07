@@ -49,19 +49,17 @@ jobs:
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
-       
-      
-      - name: Setup Python 
-        uses: actions/setup-python@v5 
         with:
-          python-version: "3.12"
+          fetch-depth: 0
 
-      - name: install checkov 
-        run: pip install checkov 
-
-
-      - name: Run Terraform scan 
-        run: |
-          checkov -d ./Terraform \
-            --framework terraform \
-            --output json > checkov-terraform-report.json || true
+      - name: Run Checkov Scan
+        uses: bridgecrewio/checkov-action@master
+        id: checkov
+        with:
+          directory: ./Terraform
+          framework: terraform
+          output_format: json
+          output_file_path: checkov-terraform-report.json
+          download_external_modules: false
+          skip_path: '**/.terraform/**'   
+          soft_fail: true
