@@ -63,3 +63,39 @@ jobs:
           download_external_modules: false
           skip_path: '**/.terraform/**'   
           soft_fail: true
+
+      - name: Upload Artifact Of Gitleak Scan 
+        uses: actions/upload-artifact@v4 
+        with: 
+          name: gitleak-report
+          path: ${{ github.workspace }}/checkov-terraform-report.json
+          if-no-files-found: warn
+
+
+  Checkov-Dcokerfile:
+    name: Checkov Dockerfile Scan 
+    needs: [gitleak-scan-security]
+    runs-on: ubuntu-latest 
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Checkov Scan
+        uses: bridgecrewio/checkov-action@master
+        id: checkov
+        with:
+          directory: ./Dockerfile
+          framework: dockerfile
+          output_format: json
+          output_file_path: checkov-dockerfile-report.json
+          download_external_modules: false   
+          soft_fail: true
+
+      - name: Upload Artifact Of Checkov Dockerfile Scan 
+        uses: actions/upload-artifact@v4 
+        with: 
+          name: checkov-dockerfile-report 
+          path: ${{ github.workspace }}/checkov-dockerfile-report.json
+          if-no-files-found: warn
