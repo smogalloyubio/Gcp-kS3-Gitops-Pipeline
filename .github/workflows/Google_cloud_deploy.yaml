@@ -45,6 +45,7 @@ jobs:
   Checkov-Terraform:
     name: Checkov Terraform Scan 
     needs: [gitleak-scan-security]
+    if: ${{ success() }}
     runs-on: ubuntu-latest 
     steps:
       - name: Checkout Source Code
@@ -127,3 +128,49 @@ jobs:
           name: checkov-kubernetes-report
           path: ${{ github.workspace }}/checkov-kubernetes-report.json
           if-no-files-found: warn
+
+
+
+  Trivy-Python-Code-Scan:
+    name: Trivy Python Code & Dependency Scan
+    needs: 
+      - gitleak-scan-security
+      - Checkov-Kubernetes
+      - Checkov-Terraform
+      - Checkov-Dcokerfile
+    if: ${{ success() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy FS Scan for Python Dependencies
+        uses: aquasecurity/trivy-action@master 
+        with:
+          scan-type: 'fs'
+          scan-ref: '.' 
+          format: 'table'
+          exit-code: '0' 
+          severity: 'HIGH,CRITICAL'
+
+  Trivy-Dockerfile-Scan:
+    name: Trivy Dockerfile Config Scan
+    needs: 
+      - gitleak-scan-security
+      - Checkov-Kubernetes
+      - Checkov-Terraform
+      - Checkov-Dcokerfile
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy misconfiguration scan on Dockerfile
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config'
+          scan-ref: './Dockerfile' 
+          format: 'table'
+          exit-code: '0'
+          severity: 'HIGH,CRITICAL'
