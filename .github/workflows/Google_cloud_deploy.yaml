@@ -17,7 +17,7 @@ permissions:
 jobs:
   gitleak-scan-security: 
     name: Run Gitleaks Security Scan
-    runs-on: ubuntu-latest # Fixed the 'ubuntun' typo
+    runs-on: ubuntu-latest 
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
@@ -45,7 +45,7 @@ jobs:
   Checkov-Terraform:
     name: Checkov Terraform Scan 
     needs: [gitleak-scan-security]
-    runs-on: ubuntu-lastest 
+    runs-on: ubuntu-latest 
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
