@@ -1,0 +1,47 @@
+name: build and  deploy   web application to google cloud  self manager kubernetes cluster k3s
+
+
+on:
+  push:
+    branches:
+      - qa-engineer
+    paths:
+     - .github/workflows/Google_cloud_deploy.yaml
+     - static/*
+     - kustomized/*
+     - Dockerfile
+
+permissions:
+   content: write 
+   id-token: write 
+
+  
+
+jobs:
+  name:  gitleak-scan-secuirty 
+  runs-on: ubuntun-latest 
+  steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+            fetch-depth: 0
+      - name: Run Gitleak scan 
+        run: |
+          docker run --rm \
+              -v "${{ github.workspace }}:/repo" \
+              zricethezav/gitleaks:latest detect \
+              --source=/repo \
+              --report-format=json \
+              --report-path=/repo/gitleaks-report.json \
+              --redact \
+              --exit-code 0
+
+      - name: Upload Artifact Of  Gitleak  Scan 
+        uses: actions/upload-artifact@v4 
+        with: 
+           name:  gitleak-report
+           path: ${{ github.workspace }}/gitleaks-report.json
+           if-no-files-found: warn 
+
+
+      
