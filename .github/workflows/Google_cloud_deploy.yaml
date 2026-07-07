@@ -151,7 +151,16 @@ jobs:
           scan-ref: '.' 
           format: 'table'
           exit-code: '0' 
+          output: trivy-scan-security-code-report.json 
           severity: 'HIGH,CRITICAL'
+
+      - name: Upload Artifact of trivy dockerfile  Scan 
+        uses: actions/upload-artifact@v4 
+        with: 
+          name: trivy-scan-security-code-report 
+          path: ${{ github.workspace }}/trivy-scan-security-code-report.json 
+          if-no-files-found: warn
+      
 
   Trivy-Dockerfile-Scan:
     name: Trivy Dockerfile Config Scan
@@ -173,4 +182,12 @@ jobs:
           scan-ref: './Dockerfile' 
           format: 'table'
           exit-code: '0'
+          output: dockerfile-trivy-scan-report.json 
           severity: 'HIGH,CRITICAL'
+
+      - name: Upload Artifact of trivy dockerfile  Scan 
+        uses: actions/upload-artifact@v4 
+        with: 
+          name: dockerfile-trivy-scan-security-report
+          path: ${{ github.workspace }}/dockerfile-trivy-scan-security-report.json
+          if-no-files-found: warn
