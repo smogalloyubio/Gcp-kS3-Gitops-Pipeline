@@ -15,7 +15,7 @@ permissions:
   id-token: write 
 
 jobs:
-  gitleak-scan-security: # This must be a unique alpha-numeric job ID
+  gitleak-scan-security: 
     name: Run Gitleaks Security Scan
     runs-on: ubuntu-latest # Fixed the 'ubuntun' typo
     steps:
@@ -41,3 +41,27 @@ jobs:
           name: gitleak-report
           path: ${{ github.workspace }}/gitleaks-report.json
           if-no-files-found: warn
+
+  Checkov-Terraform:
+    name: Checkov Terraform Scan 
+    needs: [gitleak-scan-security]
+    runs-on: ubuntu-lastest 
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+      
+      - name: Setup Python 
+        uses: actions/setup-python@v5 
+        with:
+          python-version: "3.12"
+
+      - name: install checkov 
+        runs: pip install checkov 
+
+
+      - name: Run Terraform scan 
+        run: |
+          checkov -d ./terraform \
+            --framework terraform \
+            --output json > checkov-terraform-report.json || true
