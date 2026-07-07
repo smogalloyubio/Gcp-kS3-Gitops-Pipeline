@@ -1,5 +1,4 @@
-name: build and  deploy   web application to google cloud  self manager kubernetes cluster k3s
-
+name: Build and Deploy Web Application to GCP k3s
 
 on:
   push:
@@ -15,16 +14,16 @@ permissions:
   contents: write
   id-token: write 
 
-  
-
 jobs:
-  name:  gitleak-scan-secuirty 
-  runs-on: ubuntun-latest 
-  steps:
+  gitleak-scan-security: # This must be a unique alpha-numeric job ID
+    name: Run Gitleaks Security Scan
+    runs-on: ubuntu-latest # Fixed the 'ubuntun' typo
+    steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
         with:
-            fetch-depth: 0
+          fetch-depth: 0
+
       - name: Run Gitleak scan 
         run: |
           docker run --rm \
@@ -36,12 +35,9 @@ jobs:
               --redact \
               --exit-code 0
 
-      - name: Upload Artifact Of  Gitleak  Scan 
+      - name: Upload Artifact Of Gitleak Scan 
         uses: actions/upload-artifact@v4 
         with: 
-           name:  gitleak-report
-           path: ${{ github.workspace }}/gitleaks-report.json
-           if-no-files-found: warn 
-
-
-      
+          name: gitleak-report
+          path: ${{ github.workspace }}/gitleaks-report.json
+          if-no-files-found: warn
