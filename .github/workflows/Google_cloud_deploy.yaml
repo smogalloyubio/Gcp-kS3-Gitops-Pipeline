@@ -99,3 +99,32 @@ jobs:
           name: checkov-dockerfile-report 
           path: ${{ github.workspace }}/checkov-dockerfile-report.json
           if-no-files-found: warn
+
+
+  Checkov_Kubernetes:
+    name: Checkov kubernetes Scan 
+    needs: [gitleak-scan-security]
+    runs-on: ubuntu-latest 
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Checkov Scan
+        uses: bridgecrewio/checkov-action@master
+        id: checkov
+        with:
+          directory: ./Kustomized
+          framework: kubernetes
+          output_format: json
+          output_file_path: checkov-kuberneste-report.json
+          download_external_modules: false   
+          soft_fail: true
+
+      - name: Upload Artifact Of Checkov Dockerfile Scan 
+        uses: actions/upload-artifact@v4 
+        with: 
+          name: checkov-kuberneste-report
+          path: ${{ github.workspace }}/checkov-kuberneste-report.json
+          if-no-files-found: warn
