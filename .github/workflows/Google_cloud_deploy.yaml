@@ -57,7 +57,7 @@ jobs:
           python-version: "3.12"
 
       - name: install checkov 
-        runs: pip install checkov 
+        run: pip install checkov 
 
 
       - name: Run Terraform scan 
