@@ -67,7 +67,7 @@ jobs:
       - name: Upload Artifact Of Gitleak Scan 
         uses: actions/upload-artifact@v4 
         with: 
-          name: gitleak-report
+          name: checkov-terraform-report
           path: ${{ github.workspace }}/checkov-terraform-report.json
           if-no-files-found: warn
 
@@ -86,7 +86,7 @@ jobs:
         uses: bridgecrewio/checkov-action@master
         id: checkov
         with:
-          directory: ./Dockerfile
+          file: ./Dockerfile
           framework: dockerfile
           output_format: json
           output_file_path: checkov-dockerfile-report.json
@@ -101,8 +101,8 @@ jobs:
           if-no-files-found: warn
 
 
-  Checkov_Kubernetes:
-    name: Checkov kubernetes Scan 
+  Checkov-Kubernetes:
+    name: Checkov Kubernetes Scan 
     needs: [gitleak-scan-security]
     runs-on: ubuntu-latest 
     steps:
@@ -115,16 +115,15 @@ jobs:
         uses: bridgecrewio/checkov-action@master
         id: checkov
         with:
-          directory: ./Kustomized
+          directory: ./kustomized 
           framework: kubernetes
           output_format: json
-          output_file_path: checkov-kuberneste-report.json
-          download_external_modules: false   
+          output_file_path: checkov-kubernetes-report.json
           soft_fail: true
 
-      - name: Upload Artifact Of Checkov Dockerfile Scan 
+      - name: Upload Artifact Of Checkov Kubernetes Scan 
         uses: actions/upload-artifact@v4 
         with: 
-          name: checkov-kuberneste-report
-          path: ${{ github.workspace }}/checkov-kuberneste-report.json
+          name: checkov-kubernetes-report
+          path: ${{ github.workspace }}/checkov-kubernetes-report.json
           if-no-files-found: warn
