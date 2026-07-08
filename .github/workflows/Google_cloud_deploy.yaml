@@ -302,6 +302,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: false 
+          load: true 
           tags: |
             rukevweubio/my-bitcoin-web-application:${{ github.sha }}
             rukevweubio/my-bitcoin-web-application:latest
@@ -335,4 +336,22 @@ jobs:
           name: docker-image-artifact-github-sha 
           path: /tmp/my-bitcoin-web-application.tar
           retention-days: 2
+
+
+      - name: Generate Frontend Source SBOM
+        uses: anchore/sbom-action@v0.18.0
+        with:
+          path: . 
+          format: spdx-json
+          output-file: frontend-source-sbom.spdx.json
+          upload-artifact: true
+
+      
+      - name: Generate Frontend Image SBOM
+        uses: anchore/sbom-action@v0.18.0
+        with:
+          image: rukevweubio/my-bitcoin-web-application:${{ github.sha }}
+          format: spdx-json
+          output-file: docker-image-sbom.spdx.json
+          upload-artifact: true
       
