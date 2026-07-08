@@ -2,3 +2,4 @@ Terraform/modules/compute/keys/*
 Terraform/modules/compute/keys/*
 Terraform/.terraform/*
 Terraform/.terraform/*
+Terraform/.terraform.lock.hcl
