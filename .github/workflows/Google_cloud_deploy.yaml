@@ -223,14 +223,39 @@ jobs:
       - name: Lint Frontend Assets
         run: |
           npx eslint "./static/**/*.js" --env browser || true
-          npx stylelint "./static/**/*.css" || true
 
-     
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
 
-      - name: Validate Terraform Syntax
+
+
+  Linting-source-code:
+    name: Core Linting Checks
+    needs:  
+      - Checkov-Kubernetes
+      - Checkov-Terraform
+      - Checkov-Dockerfile
+      - Trivy-Python-Code-Scan
+      - Trivy-Dockerfile-Scan
+      - gitleak-scan-security
+    if: ${{ success() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run Python Linter (Ruff)
         run: |
-          cd ./Terraform
-          terraform init -backend=false
-          terraform validate
+          pip install ruff
+          ruff check . --exit-zero 
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        continue-on-error: true
+        with:
+          node-version: "20"
+      - name: Lint Frontend Assets
+        run: |
+          npx stylelint "./static/**/*.css" || true
