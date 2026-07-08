@@ -354,4 +354,9 @@ jobs:
           format: spdx-json
           output-file: docker-image-sbom.spdx.json
           upload-artifact: true
+
+      - name: Push Images to Docker Hub
+        run: |
+             docker push rukevweubio/my-bitcoin-web-application:${{ github.sha }}
+             docker push  rukevweubio/my-bitcoin-web-application:latest
       
