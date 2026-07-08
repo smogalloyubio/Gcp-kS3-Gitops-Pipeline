@@ -388,18 +388,27 @@ jobs:
           severity: 'HIGH,CRITICAL'
 
    
-      # - name: Setup Kubernetes Context
-      #   uses: azure/k8s-set-context@v4
-      #   with:
-      #     method: kubeconfig
-      #     kubeconfig: ${{ secrets.KUBECONFIG_DEV }}
+      - name: Setup Kubernetes Context
+        uses: azure/k8s-set-context@v4
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG_DEV }}
 
+      - name: Setup Kustomize
+        uses: imranismail/setup-kustomize@v2
+        with:
+          kustomize-version: "v5.4.2"
+      
+      - name: Update Manifest Image Tag via Kustomize
+        run: |
+          cd ./kustomized
+          kustomize edit set image rukevweubio/my-bitcoin-web-application=rukevweubio/my-bitcoin-web-application:latest 
     
-      # - name: Deploy to Dev Namespace
-      #   run: |
-      #     # Apply the kustomized files directly to your dev environment namespace
-      #     kubectl apply -k ./kustomized --namespace=dev
+      - name: Deploy to Dev Namespace
+        run: |
+         
+           kubectl apply -k ./kustomized --namespace=dev
           
-      #     # Rollout status check to verify the app starts up perfectly
-      #     kubectl rollout status deployment/my-bitcoin-web-application --namespace=dev --timeout=60s
+       
+           kubectl rollout status deployment/my-bitcoin-web-application --namespace=dev --timeout=60s
       
