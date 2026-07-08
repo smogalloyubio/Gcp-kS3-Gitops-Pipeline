@@ -1,13 +1,16 @@
-name: Stage GitOps Deployment
+name: Stage GitOps Deployment  kubernstes 
 
 on:
   push:
     branches:
       - main 
+    paths:
+      - 'Stage-deploy/**'
+      - '.github/workflows/Google_cloud_stage.yaml'
+    
 
 jobs:
   deploy-to-stage:
-    if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'qa-engineer'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
