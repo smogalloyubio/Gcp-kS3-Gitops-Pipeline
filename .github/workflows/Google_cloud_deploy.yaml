@@ -193,7 +193,7 @@ jobs:
           if-no-files-found: warn
 
   Linting-Stage_code:
-    name: Core Linting Checks
+    name: Core Linting Static
     needs:  
       - Checkov-Kubernetes
       - Checkov-Terraform
@@ -232,7 +232,7 @@ jobs:
           path: ./static-reports/javascript-lint.txt 
 
   Linting-source-code:
-    name: Core Linting Checks
+    name: Core Linting Checks Source
     needs:  
       - Checkov-Kubernetes
       - Checkov-Terraform
@@ -269,4 +269,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: static-folder-lint-results
-          path: ./static-reports/
+          path: ./static-reports/* 
