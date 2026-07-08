@@ -1,17 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mypython-app
-  namespace: ubiowororuki-dev
+  name: my-bitcoin-web-application
+  namespace: dev 
+
 spec:
   replicas: 4
   selector:
     matchLabels:
-      app: mypython-app
+      app: my-bitcoin-web-application
   template:
     metadata:
       labels:
-        app: mypython-app
+        app: my-bitcoin-web-application
     spec:
       containers:
         - name: my-bitcoin-web-application
