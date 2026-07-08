@@ -363,7 +363,7 @@ jobs:
 
   Deploy-To-Dev:
     name: Scan Manifests & Deploy to Dev Namespace
-    needs: [Build-Docker-Image] 
+    needs: [building-docker-image] 
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Code
