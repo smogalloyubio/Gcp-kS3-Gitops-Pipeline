@@ -309,7 +309,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Run Trivy Security Scan (Frontend)
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: 'rukevweubio/my-bitcoin-web-application:latest'
           format: 'table'
@@ -318,7 +318,7 @@ jobs:
 
 
       - name: Run Trivy Security Scan (Frontend)
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: 'rukevweubio/my-bitcoin-web-application:${{ github.sha }}'
           format: 'table'
