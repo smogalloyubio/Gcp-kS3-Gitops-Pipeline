@@ -387,23 +387,27 @@ jobs:
           exit-code: '0' 
           severity: 'HIGH,CRITICAL'
 
-   
+  Deploy-To-kuberneste:
+    name: Deploy to Kubernetes Cluster
+    needs: [Deploy-To-Dev] 
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        
       - name: Setup Kubernetes Context
         uses: azure/k8s-set-context@v4
         with:
           method: kubeconfig
           kubeconfig: ${{ secrets.KUBECONFIG_DEV }}
 
-      - name: Setup Kustomize
-        uses: imranismail/setup-kustomize@v2
-        with:
-          kustomize-version: "v5.4.2"
       
-      - name: Update Manifest Image Tag via Kustomize
+      - name: Update Manifest Image Tag
         run: |
           cd ./kustomized
-          kustomize edit set image rukevweubio/my-bitcoin-web-application=rukevweubio/my-bitcoin-web-application:latest 
-    
+          
+           sed -i "s|image: rukevweubio/my-bitcoin-web-application:.*|image: rukevweubio/my-bitcoin-web-application:${{ github.sha }}|g" deployment.yaml
+
       - name: Deploy to Dev Namespace
         run: |
          
