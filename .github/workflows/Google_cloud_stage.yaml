@@ -1,12 +1,16 @@
-name: Production GitOps Deployment
+name: Stage GitOps Deployment
 
 on:
   push:
     branches:
       - main 
+    types:
+      - merged
+
 
 jobs:
-  deploy-to-prod:
+  deploy-to-stage:
+    if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'qa-engineer'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -48,10 +52,10 @@ jobs:
           kubeconfig: ${{ secrets.KUBECONFIG_DEV }}
 
      
-      - name: Deploy to Prod Namespace
+      - name: Deploy to Stage Namespace
         run: |
-          # Enforces deployment targeting directly into the prod namespace
+  
           kubectl apply -k ./kustomized --namespace=stage  --insecure-skip-tls-verify
           
-          # Monitor rollout status to verify your 4 application replicas start up smoothly
+        
           kubectl rollout status deployment/my-bitcoin-web-application --namespace=stage --timeout=60s --insecure-skip-tls-verify
