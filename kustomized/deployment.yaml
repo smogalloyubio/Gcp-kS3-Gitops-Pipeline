@@ -14,8 +14,8 @@ spec:
         app: mypython-app
     spec:
       containers:
-        - name: mypython-app
-          image: quay.io/ubiowororuki/mypython-app:latest
+        - name: my-bitcoin-web-application
+          image: rukevweubio/my-bitcoin-web-application
           ports:
             - containerPort: 5000
           env:

@@ -359,4 +359,47 @@ jobs:
         run: |
              docker push rukevweubio/my-bitcoin-web-application:${{ github.sha }}
              docker push  rukevweubio/my-bitcoin-web-application:latest
+
+
+  Deploy-To-Dev:
+    name: Scan Manifests & Deploy to Dev Namespace
+    needs: [Build-Docker-Image] 
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Update Manifest Image Tag
+        run: |
+          cd ./kustomized
+          # Replaces the placeholder image tag with the unique Git Commit SHA
+          #sed -i "s|newTag:.*|newTag: qabuild-${{ github.sha }}|g" kustomization.yaml || true
+          # Or if using a standard deployment file:
+           sed -i "s|image: rukevweubio/my-bitcoin-web-application:.*|image: rukevweubio/my-bitcoin-web-application:${{ github.sha }}|g" deployment.yaml
+
+     
+      - name: Run Trivy Config Scan on Manifests
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config' 
+          scan-ref: './kustomized'
+          format: 'table'
+          exit-code: '0' 
+          severity: 'HIGH,CRITICAL'
+
+   
+      # - name: Setup Kubernetes Context
+      #   uses: azure/k8s-set-context@v4
+      #   with:
+      #     method: kubeconfig
+      #     kubeconfig: ${{ secrets.KUBECONFIG_DEV }}
+
+    
+      # - name: Deploy to Dev Namespace
+      #   run: |
+      #     # Apply the kustomized files directly to your dev environment namespace
+      #     kubectl apply -k ./kustomized --namespace=dev
+          
+      #     # Rollout status check to verify the app starts up perfectly
+      #     kubectl rollout status deployment/my-bitcoin-web-application --namespace=dev --timeout=60s
       
