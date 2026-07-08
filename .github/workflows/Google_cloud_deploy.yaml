@@ -1,4 +1,4 @@
-name: Build and Deploy Web Application to GCP k3s
+name: Build and Deploy Web Application to GCP k3s  kubenestes
 
 on:
   push:
