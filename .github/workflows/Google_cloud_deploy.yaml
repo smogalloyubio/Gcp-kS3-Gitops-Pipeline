@@ -270,7 +270,7 @@ jobs:
         with:
           name: static-folder-lint-results
           path: ./static-reports/* 
-          
+
   building-docker-image:
     name: building Docker Container Image 
     runs-on: ubuntu-latest 
@@ -307,4 +307,32 @@ jobs:
             rukevweubio/my-bitcoin-web-application:latest
           cache-from: type=gha 
           cache-to: type=gha,mode=max
+
+      - name: Run Trivy Security Scan (Frontend)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: 'rukevweubio/my-bitcoin-web-application:latest'
+          format: 'table'
+          exit-code: '0'   
+          severity: 'CRITICAL,HIGH'
+
+
+      - name: Run Trivy Security Scan (Frontend)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: 'rukevweubio/my-bitcoin-web-application:${{ github.sha }}'
+          format: 'table'
+          exit-code: '0'   
+          severity: 'CRITICAL,HIGH'
+      
+      - name: Archive Docker Image
+        run: |
+          docker save rukevweubio/my-bitcoin-web-application:${{ github.sha }} -o /tmp/my-bitcoin-web-application.tar
+
+      - name: Upload Docker Image Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image-artifact-github-sha 
+          path: /tmp/my-bitcoin-web-application.tar
+          retention-days: 2
       
