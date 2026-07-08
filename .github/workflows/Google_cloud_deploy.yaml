@@ -192,7 +192,7 @@ jobs:
           path: ${{ github.workspace }}/dockerfile-trivy-scan-report.json
           if-no-files-found: warn
 
-  Linting-Stage:
+  Linting-Stage_code:
     name: Core Linting Checks
     needs:  
       - Checkov-Kubernetes
@@ -222,10 +222,14 @@ jobs:
           node-version: "20"
       - name: Lint Frontend Assets
         run: |
-          npx eslint "./static/**/*.js" --env browser || true
+          npx eslint "./static/**/*.js" --env browser > ./static-reports/javascript-lint.txt || true
 
 
-
+      - name: Upload Static Folder Lint Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-folder-lint-results
+          path: ./static-reports/javascript-lint.txt 
 
   Linting-source-code:
     name: Core Linting Checks
@@ -258,4 +262,11 @@ jobs:
           node-version: "20"
       - name: Lint Frontend Assets
         run: |
-          npx stylelint "./static/**/*.css" || true
+          npx stylelint "./static/**/*.css" > ./static-reports/css-lint.txt || true
+      
+
+      - name: Upload Static Folder Lint Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-folder-lint-results
+          path: ./static-reports/
