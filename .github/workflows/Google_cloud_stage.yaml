@@ -52,7 +52,7 @@ jobs:
       - name: Deploy to Stage Namespace
         run: |
   
-          kubectl apply -k ./kustomized --namespace=stage  --insecure-skip-tls-verify
+          kubectl apply -k ./Stage-deploy --namespace=stage  --insecure-skip-tls-verify
           
         
           kubectl rollout status deployment/my-bitcoin-web-application --namespace=stage --timeout=60s --insecure-skip-tls-verify

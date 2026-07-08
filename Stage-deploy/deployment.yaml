@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-bitcoin-web-application
+  namespace: stage
+
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: my-bitcoin-web-application
+  template:
+    metadata:
+      labels:
+        app: my-bitcoin-web-application
+    spec:
+      containers:
+        - name: my-bitcoin-web-application
+          image: rukevweubio/my-bitcoin-web-application
+          ports:
+            - containerPort: 5000
+          env:
+            - name: FLASK_ENV
+              value: production
