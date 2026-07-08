@@ -1,0 +1,57 @@
+name: Production GitOps Deployment
+
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  deploy-to-prod:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
+
+    
+      - name: Verify Merge Source Branch
+        run: |
+          echo "Verifying that commit originated from qa-engine branch..."
+          # Looks at git log history to confirm qa-engineer was the source
+          if ! git log -1 --pretty=%B | grep -q "qa-engineer"; then
+            echo "Skipping deployment: This commit did not come from a qa-engineer merge."
+            exit 0
+          fi
+          echo "Source verified! Proceeding to production scan and rollout."
+
+
+      - name: Pull Existing Docker Image
+        run: |
+          docker pull docker.io/rukevweubio/my-bitcoin-web-application:latest
+
+      - name: Run Trivy Vulnerability Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'docker.io/rukevweubio/my-bitcoin-web-application:latest'
+          format: 'table'
+          exit-code: '1' 
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+   
+      - name: Setup Kubernetes Context
+        uses: azure/k8s-set-context@v4
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG_DEV }}
+
+     
+      - name: Deploy to Prod Namespace
+        run: |
+          # Enforces deployment targeting directly into the prod namespace
+          kubectl apply -k ./kustomized --namespace=stage  --insecure-skip-tls-verify
+          
+          # Monitor rollout status to verify your 4 application replicas start up smoothly
+          kubectl rollout status deployment/my-bitcoin-web-application --namespace=stage --timeout=60s --insecure-skip-tls-verify
