@@ -5,7 +5,7 @@ metadata:
   namespace: prod
 
 spec:
-  replicas: 4
+  replicas: 10
   selector:
     matchLabels:
       app: my-bitcoin-web-application
