@@ -414,5 +414,5 @@ jobs:
            kubectl apply -k ./kustomized --namespace=dev --insecure-skip-tls-verify
           
        
-           kubectl rollout status deployment/my-bitcoin-web-application --namespace=dev --timeout=60s
+           kubectl rollout status deployment/my-bitcoin-web-application --namespace=dev --timeout=60s  --insecure-skip-tls-verify
       

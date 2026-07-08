@@ -13,7 +13,7 @@ resource "google_compute_instance" "master" {
 
   network_interface {
     subnetwork = var.public_subnet_id
-    access_config { /* Ephemeral Public IP for Master Node */ }
+    access_config {  }
   }
 
   metadata = {
@@ -36,8 +36,8 @@ resource "google_compute_instance" "workers" {
   }
 
   network_interface {
-    subnetwork = var.private_subnet_id
-    # No access_config = No Public IP address
+    subnetwork = var.public_subnet_id
+     access_config {  }
   }
 
   metadata = {

@@ -8,7 +8,7 @@ module "network" {
 # 2. Firewall Module
 module "firewall" {
   source      = "./modules/firewall"
-  main_vpc   = module.network.vpc_name
+  main_vpc    = module.network.vpc_name
   environment = var.environment
 }
 
