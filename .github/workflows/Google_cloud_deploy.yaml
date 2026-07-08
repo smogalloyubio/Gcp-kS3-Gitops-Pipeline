@@ -394,7 +394,7 @@ jobs:
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
-        
+
       - name: Setup Kubernetes Context
         uses: azure/k8s-set-context@v4
         with:
@@ -411,7 +411,7 @@ jobs:
       - name: Deploy to Dev Namespace
         run: |
          
-           kubectl apply -k ./kustomized --namespace=dev
+           kubectl apply -k ./kustomized --namespace=dev --insecure-skip-tls-verify
           
        
            kubectl rollout status deployment/my-bitcoin-web-application --namespace=dev --timeout=60s
