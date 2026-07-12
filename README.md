@@ -115,6 +115,7 @@ This platform solves these challenges by providing:
 # Architecture Overview
 
 The platform consists of four major components:
+![Achitectural Diagram](https://github.com/smogalloyubio/Gcp-kS3-Gitops-Pipeline/blob/main/ubiowororukevweimage.jpg)
 
 
 ## 1. Infrastructure Layer
@@ -266,16 +267,7 @@ End-to-End-DevSecOps-Platform
 ```
 ---
 
-# ⚙️ Infrastructure Provisioning With Terraform
-
-Terraform is used to automate the creation of the infrastructure required for the Kubernetes platform.
-Instead of manually creating servers, Terraform provides a repeatable Infrastructure as Code approach.
----
-# Terraform Deployment Process
-
-
-## Initialize Terraform
-
+# ⚙️ Infrastructure Provisioning With Terraform:
 
 Navigate to the Terraform directory:
 
