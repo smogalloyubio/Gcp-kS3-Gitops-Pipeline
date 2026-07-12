@@ -541,8 +541,4 @@ The pipeline:
 * Builds the Docker image.
 * Creates the image tag.
 * Pushes the image to Docker Hub.
-
-docker push application:v1
-```
-
----
+* -----
