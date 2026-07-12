@@ -187,6 +187,7 @@ Argo CD:
 * Deploys applications automatically.
 * Provides deployment history and rollback capability.
 ---
+![Argocd pipeline](https://github.com/smogalloyubio/Gcp-kS3-Gitops-Pipeline/blob/main/Achitecturaldiagram/Screenshot%202026-07-08%20at%2011.57.27.png)
 
 # System Architecture
 
