@@ -310,6 +310,7 @@ terraform apply
 After successful execution:
 
 ---
+![Terraform  provisioning ](https://github.com/smogalloyubio/Gcp-kS3-Gitops-Pipeline/blob/main/Achitecturaldiagram/Screenshot%202026-07-08%20at%2012.06.49.png)
 
 # ☸️ K3s Kubernetes Cluster
 
