@@ -157,6 +157,8 @@ The pipeline performs:
 * Docker image build.
 * Docker image push to Docker Hub.
 The pipeline ensures that only validated and secure application changes move forward.
+
+![Gitaction Pipeline](https://github.com/smogalloyubio/Gcp-kS3-Gitops-Pipeline/blob/main/Achitecturaldiagram/Screenshot%202026-07-08%20at%2012.07.34.png)
 ---
 
 ## 3. Deployment Layer
