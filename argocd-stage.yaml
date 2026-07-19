@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gcp-k3s-app-stage
+  namespace: argocd
+spec:
+  project: prod-project
+
+  source:
+    repoURL: https://github.com/smogalloyubio/Gcp-kS3-Gitops-Pipeline.git
+    path: production-manifest
+    targetRevision: main
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: stage
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
