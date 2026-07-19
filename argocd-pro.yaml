@@ -19,6 +19,6 @@ spec:
   namespaceResourceWhitelist:
     - group: apps
       kind: Deployment 
-    - group: " "
+    - group: ""
       kind: Service
   namespaceResourceBlacklist: []
