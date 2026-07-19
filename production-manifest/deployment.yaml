@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   name: my-bitcoin-web-application
   namespace: prod
-
 spec:
   replicas: 10
   selector:
