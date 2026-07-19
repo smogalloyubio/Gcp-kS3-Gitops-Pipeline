@@ -1,22 +1,21 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: dev-project
+  name: prod-project
   namespace: argocd
 spec:
-  description: Dev Project
+  description: Production Project
 
   sourceRepos:
     - '*'
-    
+
   destinations:
-    - namespace: developer
+    - namespace: prod
       server: https://kubernetes.default.svc
 
-  clusterResourceWhitelist:
-    - group: '*'
-      kind: '*'
-
+  clusterResourceWhitelist: []
   namespaceResourceWhitelist:
-    - group: '*'
-      kind: '*'
+    - group: apps
+      kind: Deployment
+    - group: v1
+      kind: Service
