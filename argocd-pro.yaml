@@ -14,9 +14,11 @@ spec:
       server: https://kubernetes.default.svc
 
   clusterResourceWhitelist: []
+  clusterResourceBlacklist: [] 
   
   namespaceResourceWhitelist:
     - group: apps
-      kind: Deployment
+      kind: Deployment 
     - group: v1
       kind: Service
+  namespaceResourceBlacklist: []
