@@ -4,16 +4,17 @@ metadata:
   name: prod-project
   namespace: argocd
 spec:
-  description: Production Project
+  description: Restricted Project
 
   sourceRepos:
-    - '*'
+    - https://github.com/smogalloyubio/Gcp-kS3-Gitops-Pipeline.git
 
   destinations:
     - namespace: prod
       server: https://kubernetes.default.svc
 
   clusterResourceWhitelist: []
+  
   namespaceResourceWhitelist:
     - group: apps
       kind: Deployment
