@@ -8,7 +8,7 @@ spec:
 
   source:
     repoURL: https://github.com/smogalloyubio/Gcp-kS3-Gitops-Pipeline.git
-    path: stage-deploy
+    path: Stage-deploy
     targetRevision: main
   destination:
     server: https://kubernetes.default.svc
