@@ -10,7 +10,6 @@ spec:
     repoURL: https://github.com/smogalloyubio/Gcp-kS3-Gitops-Pipeline.git
     path: production-manifest
     targetRevision: main
-
   destination:
     server: https://kubernetes.default.svc
     namespace: stage
